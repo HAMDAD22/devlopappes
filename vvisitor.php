@@ -29,7 +29,7 @@ if ($location_data !== false) {
     // Serve different HTML content based on the country
     switch ($country) {
         case 'FR':
-            include 'html_fr.html'; // HTML content for France
+            include 'https://github.com/'; // HTML content for France
             break;
         case 'US':
             include 'html_usa.html'; // HTML content for USA
