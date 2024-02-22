@@ -6,40 +6,46 @@ $api_token = '5f76d3439cc0b4';
 // Get visitor's IP address
 $ip_address = $_SERVER['REMOTE_ADDR'];
 
-// ipinfo.io API endpoint
-$api_endpoint = "https://ipinfo.io/token={$api_token}";
+// Validate and sanitize IP address
+if (!filter_var($ip_address, FILTER_VALIDATE_IP)) {
+    die("Invalid IP Address");
+}
 
-// Fetch location information from the API
-$location_data = file_get_contents($api_endpoint);
+// ipinfo.io API endpoint
+$api_endpoint = "https://ipinfo.io/{$ip_address}/json?token={$api_token}";
+
+// Initialize cURL session
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, $api_endpoint);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+// Execute cURL session
+$location_data = curl_exec($ch);
+
+// Close cURL session
+curl_close($ch);
 
 if ($location_data !== false) {
     // Decode JSON response
     $location_info = json_decode($location_data);
 
-    // Extract country and city information
-    $country = isset($location_info->country) ? $location_info->country : 'Unknown';
-    $city = isset($location_info->city) ? $location_info->city : 'Unknown';
+    // Extract country code
+    $country_code = isset($location_info->country) ? $location_info->country : '';
 
-    // Save visitor's IP and city to a text file
-    $file = 'visitors.txt';
-    $current = file_get_contents($file);
-    $current .= "IP Address: $ip_address, Country: $country, City: $city\n";
-    file_put_contents($file, $current);
-
-    // Serve different HTML content based on the country
-    switch ($country) {
+    // Redirect based on country code
+    switch ($country_code) {
         case 'FR':
-            include 'https://franvisionx.web.app/'; // HTML content for France
-            break;
+            header("Location: html_france.html");
+            exit();
         case 'US':
-            include 'html_usa.html'; // HTML content for USA
-            break;
+            header("Location: html_usa.html");
+            exit();
         case 'DE':
-            include 'html_germany.html'; // HTML content for Germany
-            break;
+            header("Location: html_germany.html");
+            exit();
         default:
-            include 'html_usa.html'; // Default to USA HTML for other countries
-            break;
+            header("Location: html_default.html");
+            exit();
     }
 } else {
     echo "Failed to fetch location information.";
