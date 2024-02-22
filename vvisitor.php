@@ -34,10 +34,10 @@ if ($location_data !== false) {
 
     // Redirect based on country code
     switch ($country_code) {
-        case 'FR':
+        case 'US':
             header("Location: html_france.html");
             exit();
-        case 'US':
+        case 'FR':
             header("Location: html_usa.html");
             exit();
         case 'DE':
